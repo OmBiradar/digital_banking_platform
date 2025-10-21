@@ -1,0 +1,84 @@
+/* pages/Home.css */
+
+.home-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 40px 20px;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+}
+
+.home-header {
+    text-align: center;
+    margin-bottom: 50px;
+}
+
+.home-header h1 {
+    font-size: 2.5rem;
+    color: #1a1a1a;
+    margin-bottom: 15px;
+    font-weight: 700;
+}
+
+.home-header p {
+    font-size: 1.2rem;
+    color: #666;
+    line-height: 1.6;
+}
+
+.features-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 30px;
+    margin-top: 40px;
+}
+
+.feature-card {
+    background: #f8f9fa;
+    padding: 30px;
+    border-radius: 8px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    border: 1px solid #e0e0e0;
+}
+
+.feature-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.feature-card h3 {
+    color: #2c3e50;
+    margin-bottom: 15px;
+    font-size: 1.3rem;
+}
+
+.feature-card p {
+    color: #555;
+    line-height: 1.6;
+    margin: 0;
+}
+
+.cta-button {
+    display: inline-block;
+    margin-top: 30px;
+    padding: 15px 40px;
+    background-color: #007bff;
+    color: white;
+    text-decoration: none;
+    border-radius: 5px;
+    font-weight: 600;
+    transition: background-color 0.3s ease;
+}
+
+.cta-button:hover {
+    background-color: #0056b3;
+}
+
+@media (max-width: 768px) {
+    .home-header h1 {
+        font-size: 2rem;
+    }
+
+    .features-grid {
+        grid-template-columns: 1fr;
+    }
+}
