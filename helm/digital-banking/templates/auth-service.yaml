@@ -1,0 +1,75 @@
+{{- if .Values.authService.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.authService.name }}
+  labels:
+    {{- include "digital-banking.labels" . | nindent 4 }}
+    app: {{ .Values.authService.name }}
+spec:
+  type: {{ .Values.authService.service.type }}
+  ports:
+    - port: {{ .Values.authService.service.port }}
+      targetPort: 8080
+      protocol: TCP
+  selector:
+    app: {{ .Values.authService.name }}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.authService.name }}
+  labels:
+    {{- include "digital-banking.labels" . | nindent 4 }}
+    app: {{ .Values.authService.name }}
+spec:
+  replicas: {{ .Values.authService.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ .Values.authService.name }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.authService.name }}
+    spec:
+      containers:
+        - name: {{ .Values.authService.name }}
+          image: "{{ .Values.authService.image.repository }}:{{ .Values.authService.image.tag }}"
+          imagePullPolicy: {{ .Values.authService.image.pullPolicy }}
+          ports:
+            - containerPort: 8080
+              protocol: TCP
+          env:
+            - name: SPRING_DATASOURCE_URL
+              value: {{ .Values.authService.env.springDatasourceUrl | quote }}
+            - name: SPRING_DATASOURCE_USERNAME
+              value: {{ .Values.authService.env.springDatasourceUsername | quote }}
+            - name: SPRING_DATASOURCE_PASSWORD
+              value: {{ .Values.authService.env.springDatasourcePassword | quote }}
+            - name: SPRING_JPA_HIBERNATE_DDL_AUTO
+              value: {{ .Values.authService.env.springJpaHibernateDdlAuto | quote }}
+            - name: SPRING_JPA_SHOW_SQL
+              value: {{ .Values.authService.env.springJpaShowSql | quote }}
+          resources:
+            {{- toYaml .Values.authService.resources | nindent 12 }}
+          {{- if .Values.authService.healthCheck.livenessProbe.enabled }}
+          livenessProbe:
+            httpGet:
+              path: {{ .Values.authService.healthCheck.livenessProbe.path }}
+              port: 8080
+            initialDelaySeconds: {{ .Values.authService.healthCheck.livenessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.authService.healthCheck.livenessProbe.periodSeconds }}
+            timeoutSeconds: {{ .Values.authService.healthCheck.livenessProbe.timeoutSeconds }}
+            failureThreshold: {{ .Values.authService.healthCheck.livenessProbe.failureThreshold }}
+          {{- end }}
+          {{- if .Values.authService.healthCheck.readinessProbe.enabled }}
+          readinessProbe:
+            httpGet:
+              path: {{ .Values.authService.healthCheck.readinessProbe.path }}
+              port: 8080
+            initialDelaySeconds: {{ .Values.authService.healthCheck.readinessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.authService.healthCheck.readinessProbe.periodSeconds }}
+            timeoutSeconds: {{ .Values.authService.healthCheck.readinessProbe.timeoutSeconds }}
+            failureThreshold: {{ .Values.authService.healthCheck.readinessProbe.failureThreshold }}
+          {{- end }}
+{{- end }}

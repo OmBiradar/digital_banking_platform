@@ -1,0 +1,87 @@
+# Default values for digital-banking.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+# PostgreSQL configuration
+postgresql:
+  enabled: true
+  name: postgres
+  image:
+    repository: postgres
+    tag: "15"
+    pullPolicy: IfNotPresent
+  service:
+    port: 5432
+  auth:
+    username: username
+    password: password
+    database: database
+  persistence:
+    enabled: true
+    size: 5Gi
+    storageClass: ""
+  resources:
+    requests:
+      memory: "256Mi"
+      cpu: "100m"
+    limits:
+      memory: "512Mi"
+      cpu: "500m"
+
+# Auth Service configuration
+authService:
+  enabled: true
+  name: auth-service
+  replicaCount: 1
+  image:
+    repository: auth-service
+    tag: v2
+    pullPolicy: Never
+  service:
+    type: ClusterIP
+    port: 8080
+  env:
+    springDatasourceUrl: "jdbc:postgresql://postgres:5432/database"
+    springDatasourceUsername: username
+    springDatasourcePassword: password
+    springJpaHibernateDdlAuto: update
+    springJpaShowSql: "true"
+  resources:
+    requests:
+      memory: "512Mi"
+      cpu: "250m"
+    limits:
+      memory: "1Gi"
+      cpu: "500m"
+  healthCheck:
+    livenessProbe:
+      enabled: true
+      path: /actuator/health
+      initialDelaySeconds: 120
+      periodSeconds: 10
+      timeoutSeconds: 5
+      failureThreshold: 3
+    readinessProbe:
+      enabled: true
+      path: /actuator/health
+      initialDelaySeconds: 90
+      periodSeconds: 5
+      timeoutSeconds: 3
+      failureThreshold: 3
+
+# Ingress configuration (optional)
+ingress:
+  enabled: false
+  className: ""
+  annotations: {}
+    # kubernetes.io/ingress.class: nginx
+    # cert-manager.io/cluster-issuer: letsencrypt-prod
+  hosts:
+    - host: banking.local
+      paths:
+        - path: /
+          pathType: Prefix
+  tls: []
+  #  - secretName: banking-tls
+  #    hosts:
+  #      - banking.local
